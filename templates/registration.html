@@ -1,0 +1,37 @@
+<html>
+  <head>
+    <title>Reusable Form Demo</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+    <!-- <link rel="stylesheet" type="text/css" href="../static/styles/css"> -->
+          <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </head>
+<body>
+    <form action="/register" method="POST">
+      <h2 class="heading-txt">REGISTRATION FORM</h2>
+      
+      <div>
+        <label>
+        <p class="label-txt">ENTER YOUR NAME</p>
+        <input type="text" name="username" class="input">
+        <div class="line-box">
+          <div class="line"></div>
+        </div>
+      </label>
+      </div>
+      <div>
+        <label>
+        <p class="label-txt">ENTER YOUR PASSWORD</p>
+        <input type="password" name="password" class="input">
+        <div class="line-box">
+          <div class="line"></div>
+        </div>
+      </label>
+    </div>
+    <div>
+      <button type="submit">submit</button>
+      </div>
+    </form>
+  </body>
+</html>
