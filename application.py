@@ -47,4 +47,8 @@ def register():
             return "<h2>message</h2>"
     return render_template('registration.html')
 
-
+@app.route("/admin", methods=["GET"])
+def fetch_users():
+    users = session.query(User).all()
+    # print(user?)
+    return render_template('admin.html', users=users)
