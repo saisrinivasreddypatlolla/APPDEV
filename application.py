@@ -30,7 +30,9 @@ index method is used when we start our app.
 """
 @APP.route("/")
 def index():
-    return "Project 1: TODO"
+    if session.get("username") is None:
+        return render_template('registration.html', text="Please Login")
+    return render_template('userhome.html', text="Welcome to homepage "+session.get("username"))
 """
 register method is used to take data from
 user and store in database.
@@ -72,11 +74,13 @@ def authentication():
     password = request.form["password"]
     data = SESSION.query(User).filter_by(username=username)
     if data[0].username == username and data[0].password == password:
-        return render_template("userhome.html", text="Welcome to homepage "+username)
+        session["username"] = data[0].username
+        return render_template("userhome.html", text="Welcome to homepage "+session["username"])
     return render_template("registration.html", text="Please enter valid username and password")
 """
 this method used when the user clicks logout button.
 """
 @APP.route("/logout")
 def logout():
+    session.clear()
     return render_template("registration.html", text="successfully logged out")
