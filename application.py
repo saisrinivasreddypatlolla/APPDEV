@@ -89,8 +89,4 @@ def logout():
     session.clear()
     return render_template("registration.html", text="successfully logged out")
 
-@APP.route("/bookdetails")
-def details():
-    # data = SESSION.query(Book).filter_by(isbn=isbn)
-    return render_template("bookdetails.html",text="hello")
 
