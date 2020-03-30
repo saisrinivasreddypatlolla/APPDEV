@@ -16,3 +16,23 @@ class User(DB.Model):
         self.username = username
         self.password = password
         self.timestamp = timestamp
+
+'''
+Class for storing book details
+'''
+class Book(DB.Model):
+    __tablename__ = "books"
+    id = DB.Column(DB.Integer, primary_key=True)
+    isbn = DB.Column(DB.String(80), index=False, unique=True, nullable=False)
+    title = DB.Column(DB.String(80), index=True, unique=False, nullable=False)
+    author = DB.Column(DB.String(128))
+    year = DB.Column(DB.Integer, index=False, unique=False, nullable=False)
+
+    def __init__(self, isbn, title, author, year) :
+        self.isbn = isbn
+        self.title = title
+        self.author = author
+        self.year = year
+
+    def __repr__(self):
+        return self.title
