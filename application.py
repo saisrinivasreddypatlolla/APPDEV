@@ -49,11 +49,10 @@ def register():
             new_user = User(username=user_name, password=password, timestamp=timestamp)
             SESSION.add(new_user)
             SESSION.commit()
-            return render_template("report.html", text="Registered successfully, Please Login")
+            return render_template("registration.html", data="Registered successfully, Please Login")
 
         except SQLAlchemyError as exception:
-            message = str(exception.__dict__['orig'])
-            return render_template("report.html", text=message)
+            return render_template("report.html", text="Please enter valid data")
     return render_template('registration.html')
 """
 this method is used to show the details of users
@@ -73,10 +72,15 @@ def authentication():
     username = request.form["username"]
     password = request.form["password"]
     data = SESSION.query(User).filter_by(username=username)
-    if data[0].username == username and data[0].password == password:
-        session["username"] = data[0].username
-        return render_template("userhome.html", text="Welcome to homepage "+session["username"])
+    # print(data)
+    try:
+        if data[0].username == username and data[0].password == password:
+            session["username"] = data[0].username
+            return render_template("userhome.html", text="Welcome to homepage "+session["username"])
+    except:
+        return render_template("registration.html", text="Please enter valid username and password")
     return render_template("registration.html", text="Please enter valid username and password")
+
 """
 this method used when the user clicks logout button.
 """
@@ -84,3 +88,9 @@ this method used when the user clicks logout button.
 def logout():
     session.clear()
     return render_template("registration.html", text="successfully logged out")
+
+@APP.route("/bookdetails")
+def details():
+    # data = SESSION.query(Book).filter_by(isbn=isbn)
+    return render_template("bookdetails.html",text="hello")
+
