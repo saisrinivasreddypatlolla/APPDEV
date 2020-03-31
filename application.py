@@ -3,7 +3,7 @@ This file is used to run the flask
 """
 import os
 import datetime
-from flask import Flask, session, request, render_template
+from flask import Flask, session, request, render_template, redirect
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
@@ -52,7 +52,7 @@ def register():
             return render_template("registration.html", data="Registered successfully, Please Login")
 
         except SQLAlchemyError as exception:
-            return render_template("report.html", text="Please enter valid data")
+            return exception
     return render_template('registration.html')
 """
 this method is used to show the details of users
@@ -76,11 +76,18 @@ def authentication():
     try:
         if data[0].username == username and data[0].password == password:
             session["username"] = data[0].username
-            return render_template("userhome.html", text="Welcome to homepage "+session["username"])
+            return redirect("/home")
     except:
         return render_template("registration.html", text="Please enter valid username and password")
     return render_template("registration.html", text="Please enter valid username and password")
 
+@APP.route("/home", methods = ["GET", "POST"])
+def home():
+    print(session.get("users").username, "*******")
+    try:
+        return render_template("userhome.html", text="Welcome to homepage "+session.get("username"))
+    except:
+        return render_template("registration.html", text="Please enter valid username and password")
 """
 this method used when the user clicks logout button.
 """
