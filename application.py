@@ -83,7 +83,6 @@ def authentication():
 
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
-    print(session.get("users").username, "*******")
     try:
         return render_template("userhome.html", text="Welcome to homepage "+session.get("username"))
     except:
@@ -96,4 +95,11 @@ def logout():
     session.clear()
     return render_template("registration.html", text="successfully logged out")
 
-
+@APP.route("/book/<string:arg>")
+def details(arg):
+    if session.get("username") is None:
+        return render_template('registration.html', text="Please Login")
+    isbn = arg.strip().split("=")[1]
+    # book = request.args.get(isbn)
+    data = SESSION.query(Book).filter_by(isbn=isbn)
+    return render_template("bookdetails.html",data=data[0])
