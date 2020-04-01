@@ -60,6 +60,7 @@ to admin.
 """
 @APP.route("/admin", methods=["GET"])
 def fetch_users():
+    print("Method in Admin API: ",request.method)
     users = SESSION.query(User).all()
     # print(user?)
     return render_template('admin.html', users=users)
@@ -83,11 +84,27 @@ def authentication():
 
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
-    print(session.get("users").username, "*******")
-    try:
-        return render_template("userhome.html", text="Welcome to homepage "+session.get("username"))
-    except:
-        return render_template("registration.html", text="Please enter valid username and password")
+    print("Method: ",request.method)
+    if request.method == 'GET':
+        searchType = ['ISBN', 'Title', 'Auther']
+        try:
+            return render_template("userhome.html", text="Welcome to homepage "+session.get("username"),searchType = searchType)
+        except:
+            return render_template("registration.html", text="Please enter valid username and password")
+    else:
+        typeOfSearch = request.form["searchType"]
+        searchedFor = request.form["search"]
+        if(len(searchedFor)>0):
+            if typeOfSearch == 'ISBN':
+                #743454553
+                books = SESSION.query(Book).filter(Book.isbn.like(f'%{searchedFor}%')).all()
+            elif typeOfSearch == 'Title':
+                books = SESSION.query(Book).filter(Book.title.like(f'%{searchedFor}%')).all()
+            elif typeOfSearch == 'Author':
+                books = SESSION.query(Book).filter(Book.author.like(f'%{searchedFor}%')).all()
+            return render_template('userhome.html',books = books)
+        else:
+            return render_template('userhome.html',message = "Please enter the input for search!")
 """
 this method used when the user clicks logout button.
 """
