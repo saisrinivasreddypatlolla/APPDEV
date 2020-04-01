@@ -9,6 +9,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from flask_session import Session
 from models import *
+from search import *
 
 APP = Flask(__name__)
 
@@ -84,27 +85,20 @@ def authentication():
 
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
-    print("Method: ",request.method)
-    if request.method == 'GET':
-        searchType = ['ISBN', 'Title', 'Auther']
-        try:
-            return render_template("userhome.html", text="Welcome to homepage "+session.get("username"),searchType = searchType)
-        except:
-            return render_template("registration.html", text="Please enter valid username and password")
-    else:
-        typeOfSearch = request.form["searchType"]
-        searchedFor = request.form["search"]
-        if(len(searchedFor)>0):
-            if typeOfSearch == 'ISBN':
-                #743454553
-                books = SESSION.query(Book).filter(Book.isbn.like(f'%{searchedFor}%')).all()
-            elif typeOfSearch == 'Title':
-                books = SESSION.query(Book).filter(Book.title.like(f'%{searchedFor}%')).all()
-            elif typeOfSearch == 'Author':
-                books = SESSION.query(Book).filter(Book.author.like(f'%{searchedFor}%')).all()
-            return render_template('userhome.html',books = books)
+    try:
+        text = "Welcome to homepage "+session.get("username")
+        if request.method == 'GET':
+            searchType = ['ISBN', 'Title', 'Auther']
+            try:
+                return render_template("userhome.html", text=text,searchType = searchType)
+            except:
+                return render_template("registration.html", text="Please enter valid username and password")
         else:
-            return render_template('userhome.html',message = "Please enter the input for search!")
+            results,message = search(request.form["searchType"],request.form["search"])
+            return render_template('userhome.html',books = results,message = message)
+    except:
+        return render_template("registration.html", text="Please Login")
+
 """
 this method used when the user clicks logout button.
 """
