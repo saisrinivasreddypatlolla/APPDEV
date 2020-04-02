@@ -3,13 +3,14 @@ This file is used to run the flask
 """
 import os
 import datetime
-from flask import Flask, session, request, render_template, redirect
+from flask import Flask, session, request, render_template, redirect, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from flask_session import Session
 from models import *
 import book_details
+import json
 
 APP = Flask(__name__)
 
@@ -106,3 +107,16 @@ def details(arg):
     if type(result) == str:
         return render_template("report.html",text=result)
     return render_template("bookdetails.html",data=result)
+
+@APP.route("/api/book/<isbn>")
+def flight_api(isbn):
+    book = book_details.book_detail(isbn)
+    if book is None:
+        return jsonify({"error": "Invalid book_id"}), 422
+
+    return jsonify({
+            "title": book.title,
+            "isbn": book.isbn,
+            "Author": book.author,
+            "Year of Publication": book.year,
+        })
