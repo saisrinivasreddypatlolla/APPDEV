@@ -9,6 +9,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from flask_session import Session
 from models import *
+import book_details
 
 APP = Flask(__name__)
 
@@ -99,7 +100,10 @@ def logout():
 def details(arg):
     if session.get("username") is None:
         return render_template('registration.html', text="Please Login")
-    isbn = arg.strip().split("=")[1]
-    # book = request.args.get(isbn)
-    data = SESSION.query(Book).filter_by(isbn=isbn)
-    return render_template("bookdetails.html",data=data[0])
+    result = book_details.book_detail(arg)
+    # isbn = arg.strip().split("=")[1]
+    # # book = request.args.get(isbn)
+    # data = SESSION.query(Book).filter_by(isbn=isbn)
+    if type(result) == str:
+        return render_template("report.html",text=result)
+    return render_template("bookdetails.html",data=result)
