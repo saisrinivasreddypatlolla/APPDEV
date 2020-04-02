@@ -45,7 +45,6 @@ def register():
         user_name = request.form['username']
         password = request.form['password']
         timestamp = datetime.datetime.now()
-        # print(timestamp)
         try:
             new_user = User(username=user_name, password=password, timestamp=timestamp)
             SESSION.add(new_user)
@@ -53,7 +52,7 @@ def register():
             return render_template("registration.html", data="Registered successfully, Please Login")
 
         except SQLAlchemyError as exception:
-            return exception
+            return render_template("registration.html",text="User already exists")
     return render_template('registration.html')
 """
 this method is used to show the details of users
