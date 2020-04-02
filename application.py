@@ -3,7 +3,7 @@ This file is used to run the flask
 """
 import os
 import datetime
-from flask import Flask, session, request, render_template, redirect
+from flask import Flask, session, request, render_template, redirect,jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
@@ -82,6 +82,35 @@ def authentication():
     except:
         return render_template("registration.html", text="Please enter valid username and password")
     return render_template("registration.html", text="Please enter valid username and password")
+
+@APP.route("/api/search",methods=['POST'])
+def api_search():
+    print("request: ",request)
+    if request.is_json:
+        tokens = request.get_json()
+        print("tokens: ",tokens)
+        if "type" in tokens and "search" in tokens:
+            searchType = tokens["type"].strip()
+            if searchType in ['ISBN','Title','Author']:
+                searchQuery = tokens['search'].strip()
+                print("searchType: ",searchType)
+                print("searchQuery: ",searchQuery)
+                results,message = search(searchType,searchQuery)
+                print("results: ",results)
+                print("message: ",message)
+                if len(message)==0:
+                    lis = []
+                    for result in results:
+                        b = {}
+                        b["ISBN"] = result.isbn
+                        lis.append(b)
+                    resultJson = {}
+                    resultJson['Books'] = lis
+                    return jsonify(resultJson)
+                return (jsonify({"Error":message}),400)
+    else:
+        return (jsonify({"Error":"Invaiid Request"}),400)
+
 
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
