@@ -3,14 +3,22 @@ This file is used to run the flask
 """
 import os
 import datetime
+<<<<<<< HEAD
+from flask import Flask, session, request, render_template, redirect,jsonify
+=======
 from flask import Flask, session, request, render_template, redirect, jsonify
+>>>>>>> master
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from flask_session import Session
 from models import *
+<<<<<<< HEAD
+from search import *
+=======
 import book_details
 import json
+>>>>>>> master
 
 APP = Flask(__name__)
 
@@ -61,6 +69,7 @@ to admin.
 """
 @APP.route("/admin", methods=["GET"])
 def fetch_users():
+    print("Method in Admin API: ",request.method)
     users = SESSION.query(User).all()
     # print(user?)
     return render_template('admin.html', users=users)
@@ -82,12 +91,63 @@ def authentication():
         return render_template("registration.html", text="Please enter valid username and password")
     return render_template("registration.html", text="Please enter valid username and password")
 
+@APP.route("/api/search",methods=['POST'])
+def api_search():
+    if request.is_json:
+        tokens = request.get_json()
+        searchType = tokens["type"].strip()
+        if "type" in tokens and "search" in tokens and searchType in ['ISBN','Title','Author']:
+            searchQuery = tokens['search'].strip()
+            results,message = search(searchType,searchQuery)
+            if len(message)==0:
+                lis = []
+                for result in results:
+                    b = {}
+                    b["ISBN"] = result.isbn
+                    lis.append(b)
+                resultJson = {}
+                resultJson['Books'] = lis
+                return jsonify(resultJson)
+            return (jsonify({"Error":message}),400)
+        return (jsonify({"Error":"Invaiid Request"}),400)
+    else:
+        return (jsonify({"Error":"Invaiid Request"}),400)
+
+@APP.route("/convert", methods=["POST"])
+  def convert():
+
+      # Query for currency exchange rate
+      currency = request.form.get("currency")
+      res = requests.get("https://api.fixer.io/latest", params={
+          "base": "USD", "symbols": currency})
+
+      # Make sure request succeeded
+      if res.status_code != 200:
+          return jsonify({"success": False})
+
+      # Make sure currency is in response
+      data = res.json()
+      if currency not in data["rates"]:
+          return jsonify({"success": False})
+
+      return jsonify({"success": True, "rate": data["rates"][currency]})
+
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
     try:
-        return render_template("userhome.html", text="Welcome to homepage "+session.get("username"))
+        text = "Welcome to homepage "+session.get("username")
+        if request.method == 'GET':
+            searchType = ['ISBN', 'Title', 'Auther']
+            try:
+                return render_template("userhome.html", text=text,searchType = searchType)
+            except:
+                return render_template("registration.html", text="Please enter valid username and password")
+        else:
+            results,message = search(request.form["searchType"],request.form["search"])
+            return render_template('userhome.html',books = results,message = message)
     except:
-        return render_template("registration.html", text="Please enter valid username and password")
+        return render_template("registration.html", text="Please Login")
+
 """
 this method used when the user clicks logout button.
 """

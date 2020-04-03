@@ -1,4 +1,17 @@
 import unittest
+<<<<<<< HEAD
+from search import *
+from models import *
+from application import *
+
+class TestApplication(unittest.TestCase):
+    def test_get_(self):
+        response = redirect('http://127.0.0.1:5000/')
+        print("response code: ",response.status_code)
+        self.assertEqual(response.status_code, 200)
+
+if __name__ == '__main__':
+=======
 from models import *
 import os
 import logging
@@ -65,4 +78,5 @@ class BasicTests(unittest.TestCase):
    
 
 if __name__ == "__main__":
+>>>>>>> master
     unittest.main()
