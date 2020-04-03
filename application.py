@@ -3,12 +3,14 @@ This file is used to run the flask
 """
 import os
 import datetime
-from flask import Flask, session, request, render_template, redirect
+from flask import Flask, session, request, render_template, redirect, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from flask_session import Session
 from models import *
+import book_details
+import json
 
 APP = Flask(__name__)
 
@@ -44,7 +46,6 @@ def register():
         user_name = request.form['username']
         password = request.form['password']
         timestamp = datetime.datetime.now()
-        # print(timestamp)
         try:
             new_user = User(username=user_name, password=password, timestamp=timestamp)
             SESSION.add(new_user)
@@ -52,7 +53,7 @@ def register():
             return render_template("registration.html", data="Registered successfully, Please Login")
 
         except SQLAlchemyError as exception:
-            return exception
+            return render_template("registration.html",text="User already exists")
     return render_template('registration.html')
 """
 this method is used to show the details of users
@@ -83,7 +84,6 @@ def authentication():
 
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
-    print(session.get("users").username, "*******")
     try:
         return render_template("userhome.html", text="Welcome to homepage "+session.get("username"))
     except:
@@ -96,4 +96,27 @@ def logout():
     session.clear()
     return render_template("registration.html", text="successfully logged out")
 
+@APP.route("/book/<string:arg>")
+def details(arg):
+    if session.get("username") is None:
+        return render_template('registration.html', text="Please Login")
+    result = book_details.book_detail(arg)
+    # isbn = arg.strip().split("=")[1]
+    # # book = request.args.get(isbn)
+    # data = SESSION.query(Book).filter_by(isbn=isbn)
+    if type(result) == str:
+        return render_template("report.html",text=result)
+    return render_template("bookdetails.html",data=result)
 
+@APP.route("/api/book/<isbn>")
+def flight_api(isbn):
+    book = book_details.book_detail(isbn)
+    if book is None:
+        return jsonify({"error": "Invalid book_id"}), 422
+
+    return jsonify({
+            "title": book.title,
+            "isbn": book.isbn,
+            "Author": book.author,
+            "Year of Publication": book.year,
+        })
