@@ -85,32 +85,44 @@ def authentication():
 
 @APP.route("/api/search",methods=['POST'])
 def api_search():
-    print("request: ",request)
     if request.is_json:
         tokens = request.get_json()
-        print("tokens: ",tokens)
-        if "type" in tokens and "search" in tokens:
-            searchType = tokens["type"].strip()
-            if searchType in ['ISBN','Title','Author']:
-                searchQuery = tokens['search'].strip()
-                print("searchType: ",searchType)
-                print("searchQuery: ",searchQuery)
-                results,message = search(searchType,searchQuery)
-                print("results: ",results)
-                print("message: ",message)
-                if len(message)==0:
-                    lis = []
-                    for result in results:
-                        b = {}
-                        b["ISBN"] = result.isbn
-                        lis.append(b)
-                    resultJson = {}
-                    resultJson['Books'] = lis
-                    return jsonify(resultJson)
-                return (jsonify({"Error":message}),400)
+        searchType = tokens["type"].strip()
+        if "type" in tokens and "search" in tokens and searchType in ['ISBN','Title','Author']:
+            searchQuery = tokens['search'].strip()
+            results,message = search(searchType,searchQuery)
+            if len(message)==0:
+                lis = []
+                for result in results:
+                    b = {}
+                    b["ISBN"] = result.isbn
+                    lis.append(b)
+                resultJson = {}
+                resultJson['Books'] = lis
+                return jsonify(resultJson)
+            return (jsonify({"Error":message}),400)
+        return (jsonify({"Error":"Invaiid Request"}),400)
     else:
         return (jsonify({"Error":"Invaiid Request"}),400)
 
+@APP.route("/convert", methods=["POST"])
+  def convert():
+
+      # Query for currency exchange rate
+      currency = request.form.get("currency")
+      res = requests.get("https://api.fixer.io/latest", params={
+          "base": "USD", "symbols": currency})
+
+      # Make sure request succeeded
+      if res.status_code != 200:
+          return jsonify({"success": False})
+
+      # Make sure currency is in response
+      data = res.json()
+      if currency not in data["rates"]:
+          return jsonify({"success": False})
+
+      return jsonify({"success": True, "rate": data["rates"][currency]})
 
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
