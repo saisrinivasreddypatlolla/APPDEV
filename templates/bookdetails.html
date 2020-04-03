@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>Registration for bookreads</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+    <!-- <link rel="stylesheet" type="text/css" href="../static/styles/css"> -->
+          <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </head>
+  <body>
+  	<div class="text-center">
+  		<div class="book">
+  			<h1>{{data.title}}</h1>
+  			<h4>ISBN : {{data.isbn}}</h4>
+  			<h4>Author : {{data.author}}</h4>
+  			<h5>Publishing Year : {{data.year}}</h5>
+  		</div>
+  	</div>
+  </body>
+</html>
