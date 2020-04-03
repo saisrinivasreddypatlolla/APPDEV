@@ -3,22 +3,15 @@ This file is used to run the flask
 """
 import os
 import datetime
-<<<<<<< HEAD
 from flask import Flask, session, request, render_template, redirect,jsonify
-=======
-from flask import Flask, session, request, render_template, redirect, jsonify
->>>>>>> master
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.exc import SQLAlchemyError
 from flask_session import Session
 from models import *
-<<<<<<< HEAD
 from search import *
-=======
 import book_details
 import json
->>>>>>> master
 
 APP = Flask(__name__)
 
@@ -113,24 +106,6 @@ def api_search():
     else:
         return (jsonify({"Error":"Invaiid Request"}),400)
 
-@APP.route("/convert", methods=["POST"])
-  def convert():
-
-      # Query for currency exchange rate
-      currency = request.form.get("currency")
-      res = requests.get("https://api.fixer.io/latest", params={
-          "base": "USD", "symbols": currency})
-
-      # Make sure request succeeded
-      if res.status_code != 200:
-          return jsonify({"success": False})
-
-      # Make sure currency is in response
-      data = res.json()
-      if currency not in data["rates"]:
-          return jsonify({"success": False})
-
-      return jsonify({"success": True, "rate": data["rates"][currency]})
 
 @APP.route("/home", methods = ["GET", "POST"])
 def home():
